@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="log_token">Token zu TRIfA senden (und dann an ToxProxy weiterleiten)</string>
+    <string name="show_notifications_summary">zum Debuggen, unabhängig von TRIfA</string>
+    <string name="quickstart_message">Diese App hat die Aufgabe, die von Ihrer ToxProxy-Instanz generierten Firebase-Benachrichtigungen zu empfangen und an die auf diesem Gerät laufende TRIfA-App weiterzuleiten.</string>
+    <string name="show_notifications">Benachrichtigungen anzeigen</string>
+    <string name="theme">Thema wählen</string>
+    <string name="lookandfeel_header">Erscheinungsbild</string>
+    <string name="title_activity_settings">Einstellungen Aktivität</string>
+    <string name="fcm_message">FCM-Nachricht</string>
+    <string name="msg_subscribe_failed">Das Wetterthema konnte nicht abonniert werden</string>
+    <string name="default_notification_channel_name">Wetter</string>
+    <string name="prefer_fcm_summary">Wenn ausgewählt, wird Google FCM für Push-Nachrichten verwendet. Wird Gotify verwenden, wenn nicht ausgewählt</string>
+    <string name="prefer_fcm">FCM bevorzugen</string>
+</resources>

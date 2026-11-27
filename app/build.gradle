@@ -1,0 +1,173 @@
+/**
+ * [TRIfA], Gradle part of TRIfA Notify Companion App
+ * Copyright (C) 2021 Zoff <zoff@zoff.cc>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
+ */
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+check.dependsOn 'assembleDebugAndroidTest'
+
+def getGitHash = { ->
+    try {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-parse', '--verify', '--short=8', 'HEAD'
+            standardOutput = stdout
+        }
+        return stdout.toString().trim()
+    }
+    catch (Exception ignored)
+    {
+        return "????????"
+    }
+}
+
+android {
+    compileSdkVersion 34
+    // buildToolsVersion "30.0.3"
+    compileOptions.encoding = 'UTF-8'
+
+    aaptOptions {
+        additionalParameters "--no-version-vectors"
+        cruncherEnabled = false
+    }
+
+    defaultConfig {
+        applicationId "com.zoffcc.applications.pushmsg2"
+        minSdkVersion 21
+        //noinspection ExpiredTargetSdkVersion
+        targetSdkVersion 30
+        versionCode 10008
+        versionName "1.0.8"
+
+        // Enabling multidex support
+        multiDexEnabled true
+
+        vectorDrawables.useSupportLibrary = true
+
+        buildConfigField "String", "GitHash", "\"${getGitHash()}\""
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        //
+        exclude 'kotlin/**'
+        exclude 'kotlin/*'
+        exclude 'kotlin'
+        exclude 'kotlin-tooling-metadata.json'
+        exclude 'META-INF/*.kotlin_module'
+        exclude 'META-INF/kotlin*'
+        exclude 'META-INF/services/kotlinx.coroutines.android.AndroidExceptionPreHandler'
+        exclude 'META-INF/services/kotlinx.coroutines.android.AndroidDispatcherFactory'
+        //
+        exclude 'META-INF/*version'
+        //
+        exclude 'DebugProbesKt.bin'
+        exclude 'firebase-common.properties'
+        exclude 'firebase-components.properties'
+        exclude 'firebase-datatransport.properties'
+        exclude 'firebase-encoders-json.properties'
+        exclude 'firebase-iid-interop.properties'
+        exclude 'firebase-iid.properties'
+        exclude 'firebase-installations-interop.properties'
+        exclude 'firebase-installations.properties'
+        exclude 'firebase-measurement-connector.properties'
+        exclude 'firebase-messaging.properties'
+        exclude 'play-services-basement.properties'
+        exclude 'play-services-base.properties'
+        exclude 'play-services-cloud-messaging.properties'
+        exclude 'play-services-stats.properties'
+        exclude 'play-services-tasks.properties'
+        exclude 'transport-api.properties'
+        exclude 'transport-backend-cct.properties'
+        exclude 'transport-runtime.properties'
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+        absolutePaths false
+    }
+
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
+    }
+
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs.
+        includeInApk = false
+        // Disables dependency metadata when building Android App Bundles.
+        includeInBundle = false
+    }
+
+    testOptions {
+        unitTests {
+        }
+    }
+    namespace 'com.zoffcc.applications.pushmsg'
+
+    compileOptions {
+        encoding "UTF-8"
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    //implementation project(":internal:lintchecks")
+    //implementation project(":internal:chooserx")
+    implementation 'androidx.annotation:annotation:1.4.0'
+    implementation 'androidx.vectordrawable:vectordrawable-animated:1.1.0'
+    implementation 'androidx.core:core:1.8.0'
+
+    implementation 'com.google.android.material:material:1.6.1'
+
+    implementation 'org.unifiedpush.android:connector:3.0.0'
+    implementation 'org.unifiedpush.android:connector-ui:1.1.0'
+
+    //Firebase Cloud Messaging (Kotlin)
+    // implementation 'com.google.firebase:firebase-messaging-ktx'
+    // implementation 'com.google.firebase:firebase-installations-ktx:16.3.4'
+
+    implementation 'android.arch.work:work-runtime:1.0.1'
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    //noinspection KtxExtensionAvailable
+    implementation 'androidx.preference:preference:1.2.0'
+
+    // Testing dependencies
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.test:rules:1.4.0'
+    androidTestImplementation 'androidx.annotation:annotation:1.4.0'
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+// apply from: 'gradle_witness_ng.gradle'

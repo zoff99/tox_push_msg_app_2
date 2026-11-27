@@ -1,0 +1,22 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory app:title="@string/lookandfeel_header">
+        <ListPreference
+            app:defaultValue="0"
+            app:entries="@array/theme_entries"
+            app:entryValues="@array/theme_values"
+            app:key="theme"
+            app:title="@string/theme"
+            app:useSimpleSummaryProvider="true" />
+    </PreferenceCategory>
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="show_notifications"
+        android:summary="@string/show_notifications_summary"
+        android:title="@string/show_notifications" />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="prefer_fcm"
+        android:summary="@string/prefer_fcm_summary"
+        android:title="@string/prefer_fcm" />
+</PreferenceScreen>

@@ -1,0 +1,144 @@
+name: Android startup
+on:
+  push:
+    paths-ignore:
+     - 'README.md'
+  pull_request:
+    paths-ignore:
+     - 'README.md'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+jobs:
+  android-startup-app:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        api-level: [35, 33, 29, 21]
+    permissions:
+      contents: write
+    if: ${{ true }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: install deps
+        run: |
+          sudo apt-get update && \
+          sudo DEBIAN_FRONTEND=noninteractive \
+          apt-get install -y --no-install-recommends \
+          fonts-freefont-otf \
+          adb \
+          wget \
+          ghostscript \
+          imagemagick \
+          ca-certificates
+
+      - name: check imagemagick
+        run: |
+          convert -list font || echo "NO ERR"
+
+      - name: Install Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: |
+            17
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: test java1
+        run:  |
+              pwd
+              type java
+              echo "===========1========="
+              java -version || exit 0
+              echo "===========2========="
+
+      - name: use dummy google json for FCM
+        run:  |
+              pwd
+              cp -av app/google-services.json__dummy app/google-services.json
+
+      - name: Build with Gradle
+        run: ./gradlew assemble ; pwd ; find . -name '*.apk'
+
+      - name: android test
+        timeout-minutes: 30
+        continue-on-error: true
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          profile: Nexus 6
+          arch: x86_64
+          ndk: 21.0.6113669
+          cmake: 3.10.2.4988404
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -skin 1080x2220 -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          disable-spellchecker: true
+          script: |
+            wget https://f-droid.org/repo/io.heckel.ntfy_60.apk -O ntfy.apk
+            adb install ntfy.apk
+            sleep 10
+            adb shell "cmd appops set io.heckel.ntfy RUN_IN_BACKGROUND allow"
+            adb shell "dumpsys deviceidle whitelist +io.heckel.ntfy"
+            adb shell "am set-standby-bucket io.heckel.ntfy active"
+            adb shell "am start -n io.heckel.ntfy/io.heckel.ntfy.ui.MainActivity" &
+            sleep 10
+            adb shell "dumpsys activity services io.heckel.ntfy"
+            wget https://f-droid.org/repo/org.unifiedpush.distributor.sunup_20.apk -O sunup.apk
+            adb install sunup.apk
+            sleep 10
+            adb shell "cmd appops set org.unifiedpush.distributor.sunup RUN_IN_BACKGROUND allow"
+            adb shell "dumpsys deviceidle whitelist +org.unifiedpush.distributor.sunup"
+            adb shell "am set-standby-bucket org.unifiedpush.distributor.sunup active"
+            adb shell "am start -n org.unifiedpush.distributor.sunup/org.unifiedpush.distributor.sunup.activities.MainActivity" &
+            sleep 10
+            adb shell "dumpsys activity services org.unifiedpush.distributor.sunup"
+            pwd
+            ./gradlew assemble ; find . -name '*.apk'
+            sleep 15
+            adb install ./app/build/outputs/apk/debug/app-debug.apk
+            adb shell "cmd appops set com.zoffcc.applications.pushmsg RUN_IN_BACKGROUND allow"
+            adb shell "am start -n com.zoffcc.applications.pushmsg/com.zoffcc.applications.pushmsg.MainActivity" &
+            sleep 20
+            adb exec-out screencap -p > ~/android_screen01_${{ matrix.api-level }}.png
+            ls -al ~/android_screen01_${{ matrix.api-level }}.png
+            adb logcat -d |grep -i 'pushmsg'
+            adb logcat -d > ~/adb_log.txt
+            sleep 2
+
+      - name: upload screenshots
+        uses: actions/upload-artifact@v7
+        with:
+          name: android_startup_${{ matrix.api-level }}
+          path: |
+            /home/runner/android_screen*.png
+
+      - name: upload screenshots
+        uses: actions/upload-artifact@v7
+        with:
+          name: android_startup_adb_log_${{ matrix.api-level }}
+          path: |
+            /home/runner/adb_log.txt
+
+      - name: Upload to nightly release
+        uses: ncipollo/release-action@v1
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/master'
+        with:
+          allowUpdates: true
+          tag: nightly
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          prerelease: true
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "/home/runner/android_screen01_${{ matrix.api-level }}.png"
+
