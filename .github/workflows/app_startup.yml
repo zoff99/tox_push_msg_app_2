@@ -61,11 +61,6 @@ jobs:
               java -version || exit 0
               echo "===========2========="
 
-      - name: use dummy google json for FCM
-        run:  |
-              pwd
-              cp -av app/google-services.json__dummy app/google-services.json
-
       - name: Build with Gradle
         run: ./gradlew assemble ; pwd ; find . -name '*.apk'
 
@@ -106,8 +101,8 @@ jobs:
             ./gradlew assemble ; find . -name '*.apk'
             sleep 15
             adb install ./app/build/outputs/apk/debug/app-debug.apk
-            adb shell "cmd appops set com.zoffcc.applications.pushmsg RUN_IN_BACKGROUND allow"
-            adb shell "am start -n com.zoffcc.applications.pushmsg/com.zoffcc.applications.pushmsg.MainActivity" &
+            adb shell "cmd appops set com.zoffcc.applications.pushmsg2 RUN_IN_BACKGROUND allow"
+            adb shell "am start -n com.zoffcc.applications.pushmsg2/com.zoffcc.applications.pushmsg.MainActivity" &
             sleep 20
             adb exec-out screencap -p > ~/android_screen01_${{ matrix.api-level }}.png
             ls -al ~/android_screen01_${{ matrix.api-level }}.png
