@@ -1,6 +1,6 @@
 # Tox Push Message App
 
-<a href="https://github.com/zoff99/ToxAndroidRefImpl"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/android-refimpl-app/app/src/main/res/drawable/web_hi_res_512.png" width="200"></a><a href="https://unifiedpush.org/"><img src="https://raw.githubusercontent.com/zoff99/tox_push_msg_app_2/master/doc/76251555.png" width="40"></a>&nbsp;&nbsp;<a href="https://ntfy.sh/"><img src="https://raw.githubusercontent.com/zoff99/tox_push_msg_app_2/master/doc/logo.077f6a13.svg" width="40"></a>&nbsp;&nbsp;<a href="https://github.com/mozilla-services/autopush-rs"><img src="https://raw.githubusercontent.com/zoff99/tox_push_msg_app_2/refs/heads/master/doc/sunup.png" width="40"></a>
+<a href="https://github.com/zoff99/trifa_ma"><img src="https://raw.githubusercontent.com/zoff99/trifa_ma/master/android-refimpl-app/app/src/main/res/drawable/web_hi_res_512.png" width="200"></a><a href="https://unifiedpush.org/"><img src="https://raw.githubusercontent.com/zoff99/tox_push_msg_app_2/master/doc/76251555.png" width="40"></a>&nbsp;&nbsp;<a href="https://ntfy.sh/"><img src="https://raw.githubusercontent.com/zoff99/tox_push_msg_app_2/master/doc/logo.077f6a13.svg" width="40"></a>&nbsp;&nbsp;<a href="https://github.com/mozilla-services/autopush-rs"><img src="https://raw.githubusercontent.com/zoff99/tox_push_msg_app_2/refs/heads/master/doc/sunup.png" width="40"></a>
 
 
 
