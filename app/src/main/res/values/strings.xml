@@ -16,7 +16,7 @@
     <string name="theme">Choose theme</string>
 
     <string name="show_notifications">Show notifications</string>
-    <string name="show_notifications_summary">for debugging, independent of TRIfA</string>
+    <string name="show_notifications_summary">for debugging, independent of TRIfAma</string>
 
     <string name="prefer_fcm">Prefer FCM</string>
     <string name="prefer_fcm_summary">use Google FCM for push messages if selected. use nfty.sh if not selected</string>

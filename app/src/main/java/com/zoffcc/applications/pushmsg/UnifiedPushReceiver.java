@@ -89,36 +89,33 @@ public class UnifiedPushReceiver extends org.unifiedpush.android.connector.Messa
 
         try
         {
-            if (!getSettings(context).getBoolean("prefer_fcm", true))
+            // wake up trifa here ------------------
+            final Intent intent = new Intent();
+            intent.setAction("com.zoffcc.applications.trifa.TOKEN_CHANGED");
+            intent.putExtra("token", correct_endpoint);
+            intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+            intent.setComponent(new ComponentName("com.zoffcc.applications.trifa",
+                                                  "com.zoffcc.applications.trifa.MyTokenReceiver"));
+            context.sendBroadcast(intent);
+            // wake up trifa here ------------------
+
+            final String msg = context.getString(R.string.msg_token_fmt, correct_endpoint);
+
+            try
             {
-                // wake up trifa here ------------------
-                final Intent intent = new Intent();
-                intent.setAction("com.zoffcc.applications.trifa.TOKEN_CHANGED");
-                intent.putExtra("token", correct_endpoint);
-                intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-                intent.setComponent(new ComponentName("com.zoffcc.applications.trifa",
-                                                      "com.zoffcc.applications.trifa.MyTokenReceiver"));
-                context.sendBroadcast(intent);
-                // wake up trifa here ------------------
-
-                final String msg = context.getString(R.string.msg_token_fmt, correct_endpoint);
-
-                try
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable()
                 {
-                    Handler handler = new Handler(Looper.getMainLooper());
-                    handler.post(new Runnable()
+                    @Override
+                    public void run()
                     {
-                        @Override
-                        public void run()
-                        {
-                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-                catch (Exception e3)
-                {
-                    e3.printStackTrace();
-                }
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch (Exception e3)
+            {
+                e3.printStackTrace();
             }
         }
         catch (Exception e)

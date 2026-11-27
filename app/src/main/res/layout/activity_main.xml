@@ -98,7 +98,7 @@
                 android:layout_gravity="left"
                 android:background="@color/blue_grey_700"
                 android:scaleType="centerInside"
-                android:src="@drawable/common_full_open_on_phone"
+                android:src="@drawable/ic_stat_ic_notification"
                 android:textAllCaps="false" />
 
             <TextView android:layout_height="1dp"
@@ -121,21 +121,6 @@
                 android:layout_weight="1"
                 android:text="" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/DistributorsTextViewHeaderFcm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:text="available FCM Distributors:"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/DistributorsTextViewFcm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="none"
-            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/DistributorsTextViewHeader"

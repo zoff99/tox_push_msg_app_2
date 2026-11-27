@@ -35,10 +35,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.zoffcc.applications.pushmsg.databinding.ActivityMainBinding;
 
 import org.unifiedpush.android.connector.UnifiedPush;
@@ -59,7 +55,6 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = "MainActivity";
     private ActivityMainBinding binding = null;
-    static TextView DistributorsTextViewFCM = null;
     static TextView used_distributor = null;
     private static TextView DistributorsTextView = null;
 
@@ -87,22 +82,9 @@ public class MainActivity extends AppCompatActivity
 
         used_distributor = findViewById(R.id.used_distributor);
 
-        DistributorsTextViewFCM = findViewById(R.id.DistributorsTextViewFcm);
         DistributorsTextView = findViewById(R.id.DistributorsTextView);
 
-        DistributorsTextViewFCM.setText("none");
         DistributorsTextView.setText("none");
-
-        try
-        {
-            // HINT: try to detect if FCM is available on this device
-            FirebaseApp.getInstance();
-            DistributorsTextViewFCM.setText("FCM");
-        }
-        catch (Exception e)
-        {
-            DistributorsTextViewFCM.setText("none");
-        }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
@@ -137,10 +119,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                if (!settings.getBoolean("prefer_fcm", true))
-                {
-                    changeUnifiedPushDistributor(v.getContext(), "com.zoffcc.applications.pushmsg", settings);
-                }
+                changeUnifiedPushDistributor(v.getContext(), "com.zoffcc.applications.pushmsg", settings);
             }
         });
 
@@ -149,42 +128,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                if (settings.getBoolean("prefer_fcm", true))
-                {
-                    // Get token
-                    FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>()
-                    {
-                        @Override
-                        public void onComplete(@NonNull Task<String> task)
-                        {
-                            if (!task.isSuccessful())
-                            {
-                                Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                                return;
-                            }
-
-                            try
-                            {
-                                // wake up trifa here ------------------
-                                final Intent intent = new Intent();
-                                intent.setAction("com.zoffcc.applications.trifa.TOKEN_CHANGED");
-                                intent.putExtra("token", task.getResult());
-                                intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-                                intent.setComponent(new ComponentName("com.zoffcc.applications.trifa",
-                                                                      "com.zoffcc.applications.trifa.MyTokenReceiver"));
-                                MainActivity.this.sendBroadcast(intent);
-                                // wake up trifa here ------------------
-
-                                String msg = MainActivity.this.getString(R.string.msg_token_fmt, task.getResult());
-                                Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                }
             }
         });
 
@@ -196,53 +139,9 @@ public class MainActivity extends AppCompatActivity
     {
         super.onResume();
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        if (!settings.getBoolean("prefer_fcm", true))
-        {
-            binding.logTokenButton.setVisibility(View.GONE);
-        }
-        else
-        {
-            binding.logTokenButton.setVisibility(View.VISIBLE);
-        }
-
+        binding.logTokenButton.setVisibility(View.GONE);
         set_used_distributor_text(this, settings);
-
-        if (settings.getBoolean("prefer_fcm", true))
-        {
-            used_distributor.setText("trying to use Goolge FCM");
-            // HINT: if we switch to FCM, remove all unified push distributors
-            try
-            {
-                UnifiedPush.removeDistributor(this);
-            }
-            catch(Exception ignored)
-            {
-            }
-            try
-            {
-                UnifiedPush.forceRemoveDistributor(this);
-                settings.edit().putString("UP_ENDPOINT", "").commit();
-            }
-            catch(Exception ignored)
-            {
-            }
-        }
-        else
-        {
-            try
-            {
-                // HINT: if we switch to UnifiedPush, remove FCM token
-                FirebaseMessaging.getInstance().deleteToken();
-            }
-            catch (Exception e)
-            {
-            }
-        }
-
-        if (!settings.getBoolean("prefer_fcm", true))
-        {
-            registerAppWithDialog(this, "com.zoffcc.applications.pushmsg", settings);
-        }
+        registerAppWithDialog(this, "com.zoffcc.applications.pushmsg", settings);
     }
 
     public static void set_used_distributor_text(Context c, SharedPreferences settings)
@@ -287,7 +186,7 @@ public class MainActivity extends AppCompatActivity
         {
         }
 
-        if ((UnifiedPush.getSavedDistributor(context) == null) && (!settings.getBoolean("prefer_fcm", true)))
+        if (UnifiedPush.getSavedDistributor(context) == null)
         {
             // UnifiedPush.saveDistributor(context, UnifiedPush.getDistributor(context));
             String[] distributorArray = distributors.toArray(new String[0]);
@@ -320,42 +219,38 @@ public class MainActivity extends AppCompatActivity
         {
         }
 
-        if (!settings.getBoolean("prefer_fcm", true))
-        {
-            // UnifiedPush.saveDistributor(context, UnifiedPush.getDistributor(context));
-            String[] distributorArray = distributors.toArray(new String[0]);
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Change Distributor");
-            builder.setItems(distributorArray, (dialog, which) -> {
-                String selectedDistributor = distributorArray[which];
-                try
-                {
-                    UnifiedPush.removeDistributor(context);
+        // UnifiedPush.saveDistributor(context, UnifiedPush.getDistributor(context));
+        String[] distributorArray = distributors.toArray(new String[0]);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Change Distributor");
+        builder.setItems(distributorArray, (dialog, which) -> {
+            String selectedDistributor = distributorArray[which];
+            try
+            {
+                UnifiedPush.removeDistributor(context);
+            }
+            catch(Exception ignored)
+            {
+            }
+            try
+            {
+                UnifiedPush.forceRemoveDistributor(context);
+                settings.edit().putString("UP_ENDPOINT", "").commit();
+            }
+            catch(Exception ignored)
+            {
+            }
+            UnifiedPush.saveDistributor(context, selectedDistributor);
+            UnifiedPush.registerApp(context, slug, "tox_push_msg_app", null);
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    // Code here will run on the UI thread
+                    set_used_distributor_text(context, settings);
                 }
-                catch(Exception ignored)
-                {
-                }
-                try
-                {
-                    UnifiedPush.forceRemoveDistributor(context);
-                    settings.edit().putString("UP_ENDPOINT", "").commit();
-                }
-                catch(Exception ignored)
-                {
-                }
-                UnifiedPush.saveDistributor(context, selectedDistributor);
-                UnifiedPush.registerApp(context, slug, "tox_push_msg_app", null);
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Code here will run on the UI thread
-                        set_used_distributor_text(context, settings);
-                    }
-                });
             });
-            builder.setNegativeButton("Cancel", null);
-            builder.show();
-        }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
     }
-
 }
