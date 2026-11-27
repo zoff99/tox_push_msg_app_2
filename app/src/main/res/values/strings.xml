@@ -3,7 +3,7 @@
     <string name="quickstart_message">This App\'s purpose is to receive Push Notifications and forward them to the TRIfA App running on this device.</string>
     <string name="log_token">Send Token to TRIfA</string>
 
-    <string name="msg_token_fmt" translatable="false">FCM registration Token: %s</string>
+    <string name="msg_token_fmt" translatable="false">registration Token: %s</string>
 
     <string name="default_notification_channel_id" translatable="false">fcm_default_channel</string>
     <string name="default_notification_channel_name">Weather</string>
