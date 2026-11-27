@@ -91,7 +91,7 @@ public class UnifiedPushReceiver extends org.unifiedpush.android.connector.Messa
         {
             // wake up trifa here ------------------
             final Intent intent = new Intent();
-            intent.setAction("com.zoffcc.applications.trifa.TOKEN_CHANGED");
+            intent.setAction("com.zoffcc.applications.trifama.TOKEN_CHANGED");
             intent.putExtra("token", correct_endpoint);
             intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
             intent.setComponent(new ComponentName("com.zoffcc.applications.trifama",
@@ -170,7 +170,7 @@ public class UnifiedPushReceiver extends org.unifiedpush.android.connector.Messa
                 {
                     // wake up trifa here ------------------
                     final Intent intent = new Intent();
-                    intent.setAction("com.zoffcc.applications.trifa.EXTERN_RECV");
+                    intent.setAction("com.zoffcc.applications.trifama.EXTERN_RECV");
                     intent.putExtra("task", "wakeup");
                     intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
                     intent.setComponent(new ComponentName("com.zoffcc.applications.trifama",
